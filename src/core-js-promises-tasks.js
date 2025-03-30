@@ -61,7 +61,20 @@ async function getPromiseResult(source) {
  * [Promise.reject(1), Promise.reject(2), Promise.reject(3)]    => Promise rejected
  */
 function getFirstResolvedPromiseResult(promises) {
-  return Promise.race(promises);
+  return new Promise((resolve, reject) => {
+    let rejectedCount = 0;
+    promises.forEach((promise) => {
+      promise.then(
+        (value) => resolve(value),
+        () => {
+          rejectedCount += 1;
+          if (rejectedCount === promises.length) {
+            reject();
+          }
+        }
+      );
+    });
+  });
 }
 
 /**
